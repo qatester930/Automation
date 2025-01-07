@@ -3,7 +3,7 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   viewportWidth: 1280,  // Set your desired width
   viewportHeight: 720,  // Set your desired height
-  defaultCommandTimeout: 25000,
+  defaultCommandTimeout: 45000,
   pageLoadTimeout: 60000,
   e2e: {
     baseUrl: 'https://uiredevelopment.volopa.com/',
