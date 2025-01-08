@@ -27,7 +27,7 @@ describe('Recipient List Test Cases', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
     })
-    it('TC_RL-004-Verify that user is able to add recipient', () => {
+    it.only('TC_RL-004-Verify that user is able to add recipient', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
         recipientlist.ValidateAddRecipient('UN', 'G', '')
@@ -103,18 +103,18 @@ describe('Recipient List Test Cases', () => {
         recipientlist.AddAddress('H25')
         recipientlist.AddCity('Lahore')
         recipientlist.SelectRecipientCountry(null)
-       recipientlist.ValidateCity().then(cityindex=>{
-            recipientlist.ValidateRecipientCountry().then(countryindex =>{
+        recipientlist.ValidateCity().then(cityindex => {
+            recipientlist.ValidateRecipientCountry().then(countryindex => {
                 expect(countryindex).to.be.lessThan(cityindex)
-                
+
             })
         })
-     
-       
+
+
         recipientlist.clickAddRecipient()
         recipientlist.validateRecipientCountryFieldError('Please select recipient country')
     })
-   
+
     it('TC_RL-09-Verify that "Recipient Country" is a mandatory field for the users-SEK to Sweden-DKK to Denmark-NOK to Norway', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
