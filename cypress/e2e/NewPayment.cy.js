@@ -3,12 +3,16 @@
 import { SigninPage } from "../pageObject/SigninPage"
 import { NewPaymentPage } from "../pageObject/NewPaymentPage";
 import { RecipientListPage } from "../pageObject/RecipientListPage";
+import { FundWalletPage } from "../pageObject/FundWalletPage";
 const signinpage = new SigninPage;
-const newpayment= new NewPaymentPage;
+const newpayment = new NewPaymentPage;
 const recipientlist = new RecipientListPage;
+const fundwallet = new FundWalletPage;
 describe('New Payment Test Cases', () => {
     const userName = Cypress.config('users').user2.username
     const password = Cypress.config('users').user2.password
+    const username = Cypress.config('ozoneAPIusers').Username
+    const passWord = Cypress.config('ozoneAPIusers').Password
 
 
     beforeEach(() => {
@@ -27,15 +31,165 @@ describe('New Payment Test Cases', () => {
     })
     it('TC_NP-003-Verify that user landed on Add Recipient page', () => {
         newpayment.gotoNewPayment()
-       recipientlist.gotoRecipientList()
-       recipientlist.gotoAddRecipient()
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
     })
-    it('TC_NP-004-VVerify that user is able to navigate Create a Payment page', () => {
+    it('TC_NP-004-Verify that user is able to navigate Create a Payment page', () => {
         newpayment.gotoNewPayment()
     })
-    it.only('TC_NP-005-Verify that Funding Method Easy Transfer is not available for currencies other than GBP and Euro', () => {
+    it('TC_NP-005-Verify that Funding Method Easy Transfer is not available for currencies other than GBP and Euro', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('240')
+        newpayment.ValidateFundingMethod('US','240')
     })
+    it('TC_NP-006-Verify that FX rate is appearing and will refresh every 30 seconds.', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFXRate()
+    })
+    it('TC_NP-007-User is able to navigate "Recipient List" on clicking the "View Details" button under the "Recipient Details" tag', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.validateRecipientData('sad')
+    })
+    it('TC_NP-008-Verify that user is able to pay the recipient (Not yapily flow - Currencies other than "Euro" and "GBP")', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.ValidateFundingMethod('US','240')
+        newpayment.PayRecipient('new test')
+
+    })
+    it('TC_NP-009-  Verify that after paying the recipient, user is able to view the payment', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.ValidateFundingMethod('US','240')
+        newpayment.PayRecipient('new test')
+        newpayment.ViewPayment()
+    })
+    it('TC_NP-10-  Verify that after paying the recipient, user is able to proceed to a new payment', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.ValidateFundingMethod('US','240')
+        newpayment.PayRecipient('new test')
+        newpayment.NewPayment()
+    })
+    it('TC_NP-11-  Verify that after paying the recipient, user is able to proceed to return to apymnet dashboard', () => {
+        newpayment.gotoNewPayment()
+        newpayment.ValidateSearchBar('sad')
+        newpayment.ValidateFundingMethod('US','240')
+        newpayment.PayRecipient('new test')
+        newpayment.ReturntoDashboard()
+    })
+    it('TC_NP-13-payments to the recipients without ABA code with currency USD & country US should have only (priority) enabled.', () => {
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
+        recipientlist.ValidateAddRecipient('UNITED STATES', 'US')
+        recipientlist.AddSwiftcodeBIC('BARCGB22')
+        recipientlist.AddAccountNumber('13071472')
+        recipientlist.AddABAcode(null)
+        recipientlist.AddRecipientType()
+        recipientlist.AddBusinessname('Test2')
+        recipientlist.AddBusinessDescription('New business')
+        recipientlist.AddBusinessNature('finance')
+        recipientlist.AddPostCode('11115')
+        recipientlist.AddState('us')
+        recipientlist.AddAddress('H25')
+        recipientlist.AddCity('Lahore')
+        recipientlist.SelectRecipientCountry('UNITED STATES')
+        recipientlist.clickAddRecipient()
+        recipientlist.gotoPayRecipient()
+        newpayment.EnabledPriorityButton()
+        newpayment.DisabledRegularButton()
+    })
+
+    it('TC_NP-12-payments to the recipients with ABA code with currency USD & country US should have both Methods (Regular, priority) enabled.', () => {
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
+        recipientlist.ValidateAddRecipient('UNITED STATES', 'US')
+        recipientlist.AddSwiftcodeBIC('BARCGB22')
+        recipientlist.AddAccountNumber('13071472')
+        recipientlist.AddABAcode('123456789')
+        recipientlist.AddRecipientType()
+        recipientlist.AddBusinessname('Test2')
+        recipientlist.AddBusinessDescription('New business')
+        recipientlist.AddBusinessNature('finance')
+        recipientlist.AddPostCode('11115')
+        recipientlist.AddState('us')
+        recipientlist.AddAddress('H25')
+        recipientlist.AddCity('Lahore')
+        recipientlist.SelectRecipientCountry('UNITED STATES')
+        recipientlist.clickAddRecipient()
+        recipientlist.gotoPayRecipient()
+        newpayment.EnabledPriorityButton()
+        newpayment.EnabledRegularButton()
+    })
+    it('TC_NP-14-payments to the recipients with ABA code with currency Euro & country US should have only (priority) enabled.', () => {
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
+        recipientlist.ValidateAddRecipient('UNITED STATES', 'EUR')
+        recipientlist.AddSwiftcodeBIC('BARCGB22')
+        recipientlist.AddAccountNumber('13071472')
+        recipientlist.AddABAcode('123456789')
+        recipientlist.AddRecipientType()
+        recipientlist.AddBusinessname('Test2')
+        recipientlist.AddBusinessDescription('New business')
+        recipientlist.AddBusinessNature('finance')
+        recipientlist.AddPostCode('11115')
+        recipientlist.AddState('us')
+        recipientlist.AddAddress('H25')
+        recipientlist.AddCity('Lahore')
+        recipientlist.SelectRecipientCountry('UNITED STATES')
+        recipientlist.clickAddRecipient()
+        recipientlist.gotoPayRecipient()
+        newpayment.EnabledPriorityButton()
+        newpayment.DisabledRegularButton()
+    })
+    it('TC_NP-15-payments to the recipients without ABA code with currency Euro & country US should have only (priority) enabled.', () => {
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
+        recipientlist.ValidateAddRecipient('UNITED STATES', 'EUR')
+        recipientlist.AddSwiftcodeBIC('BARCGB22')
+        recipientlist.AddAccountNumber('13071472')
+        recipientlist.AddABAcode(null)
+        recipientlist.AddRecipientType()
+        recipientlist.AddBusinessname('Test2')
+        recipientlist.AddBusinessDescription('New business')
+        recipientlist.AddBusinessNature('finance')
+        recipientlist.AddPostCode('11115')
+        recipientlist.AddState('us')
+        recipientlist.AddAddress('H25')
+        recipientlist.AddCity('Lahore')
+        recipientlist.SelectRecipientCountry('UNITED STATES')
+        recipientlist.clickAddRecipient()
+        recipientlist.gotoPayRecipient()
+        newpayment.EnabledPriorityButton()
+        newpayment.DisabledRegularButton()
+    })
+    it.only('TC_NP-16- Verify that Yapily flow journey and transaction is completed', () => {
+        recipientlist.gotoRecipientList()
+        recipientlist.gotoAddRecipient()
+        recipientlist.ValidateAddRecipient('UNITED STATES', 'US')
+        recipientlist.AddSwiftcodeBIC('BARCGB22')
+        recipientlist.AddAccountNumber('13071472')
+        recipientlist.AddABAcode(123456789)
+        recipientlist.AddRecipientType()
+        recipientlist.AddBusinessname('Test2')
+        recipientlist.AddBusinessDescription('New business')
+        recipientlist.AddBusinessNature('finance')
+        recipientlist.AddPostCode('11115')
+        recipientlist.AddState('us')
+        recipientlist.AddAddress('H25')
+        recipientlist.AddCity('Lahore')
+        recipientlist.SelectRecipientCountry('UNITED STATES')
+        recipientlist.clickAddRecipient()
+        recipientlist.gotoPayRecipient()
+        newpayment.ValidateFundingMethod('EUR','240')
+        newpayment.PayRecipient('new test')
+        newpayment.gotoEasyTransfer()
+        fundwallet.ValidateYapily('Modelo Sandbox')
+        fundwallet.gotoOzoneAPI(username,passWord)
+        newpayment.validatePayment()
+    })
+   
 })

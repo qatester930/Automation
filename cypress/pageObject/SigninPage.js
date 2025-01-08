@@ -1,5 +1,5 @@
 export class SigninPage {
-    Signin(userName, password) {
+    Signin(userName, password,userEEA,passwordEEA) {
         cy.get('[class="ant-image-img"]').should('be.visible') //logo
         cy.get('[class="ant-typography fs-18px medium"]').should('be.visible').and('contain.text', 'Welcome Back!')
         if (userName != null) {
@@ -7,6 +7,12 @@ export class SigninPage {
         }
         if (password != null) {
             cy.get('[id="password"]').should('exist').and('have.attr', 'placeholder', 'Enter Password').clear().type(password)
+        }
+        if (userEEA != null) {
+            cy.get('[id="username"]').should('exist').and('have.attr', 'placeholder', 'Username/email').clear().type(userEEA)
+        }
+        if (passwordEEA != null) {
+            cy.get('[id="password"]').should('exist').and('have.attr', 'placeholder', 'Enter Password').clear().type(passwordEEA)
         }
     }
     clickLogin() {

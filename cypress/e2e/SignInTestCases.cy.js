@@ -11,6 +11,7 @@ cy.visit('/login')
 
   const userName = Cypress.config('users').user1.username
   const password = Cypress.config('users').user1.password
+  
 
   it('TC_SIGN_001 - user is able to login with valid password or valid username', () => {
     cy.log(userName)

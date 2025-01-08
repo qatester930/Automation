@@ -3,7 +3,7 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   viewportWidth: 1280,  // Set your desired width
   viewportHeight: 720,  // Set your desired height
-  defaultCommandTimeout: 45000,
+  defaultCommandTimeout: 50000,
   pageLoadTimeout: 60000,
   e2e: {
     baseUrl: 'https://uiredevelopment.volopa.com/',
@@ -23,11 +23,15 @@ module.exports = defineConfig({
       user3: {
         username: "testnew@volopa.com",
         password: "testTest1"
+      },
+      user4: {
+        username: "carmenTestingBWA3@gmail.com",
+        password: "testTest1"
       }
     },
-    ozoneAPIusers:{
-      Username:"mits",
-      Password:"mits"
+    ozoneAPIusers: {
+      Username: "mits",
+      Password: "mits"
     },
     setupNodeEvents(on, config) {
 

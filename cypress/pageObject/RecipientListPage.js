@@ -69,6 +69,24 @@ export class RecipientListPage {
             cy.get('#bank_code').should('not.be.disabled').type(Bankcode)
         }
     }
+    AddABAcode(ABAcode) {
+        cy.get('.ant-col.ant-form-item-label').contains('ABA')
+        if (ABAcode != null) {
+            cy.get('#aba').should('not.be.disabled').type(ABAcode)
+        }
+    }
+    AddCLABE(CLABE) {
+        cy.get('.ant-col.ant-form-item-label').contains('CLABE')
+        if (CLABE != null) {
+            cy.get('#clabe').should('not.be.disabled').type(CLABE)
+        }
+    }
+    AddIFSC(IFSC){
+        cy.get('.ant-col.ant-form-item-label').contains('IFSC')
+        if (IFSC != null) {
+            cy.get('#clabe').should('not.be.disabled').type(IFSC)
+        }
+    }
     AddRecipientType() {
         cy.get('.ant-col-xs-24 > .ant-space-vertical >').eq(0).should('be.visible').and('contain.text', 'Recipient Type')
         cy.get('.ant-space > :nth-child(2) > .ant-card').should('exist').and('contain.text', 'Business').click()
@@ -78,7 +96,7 @@ export class RecipientListPage {
         cy.get('#businessName').should('not.be.disabled').type(businessName)
     }
     AddBusinessDescription(businessDescription) {
-        cy.get('.ant-col.ant-form-item-label').eq(8).should('be.visible').and('contain.text', 'Business Description')
+        cy.get('.ant-col.ant-form-item-label').contains('Business Description')
         cy.get('#businessDescription').should('not.be.disabled').type(businessDescription)
     }
     AddBusinessNature(businessNature) {
@@ -97,6 +115,12 @@ export class RecipientListPage {
             cy.get('#postcode').should('not.be.disabled').type(postcode)
         }
     }
+    AddState(state) {
+        cy.get('.ant-col.ant-form-item-label').contains('State')
+        if (state != null) {
+            cy.get('#state').should('not.be.disabled').type(state)
+        }
+    }
     AddCity(beneficiaryCity) {
         cy.get('.ant-col.ant-form-item-label').contains('City')
         if (beneficiaryCity != null) {
@@ -109,6 +133,13 @@ export class RecipientListPage {
             cy.get('#beneficiaryCountry').should('not.be.disabled').type(RecipientCountry + '{enter}')
         }
     }
+    SelectPaymentPurpose(PaymentPurpose) {
+        cy.get('.ant-typography.muli.semi-bold.fs-24px.dark-green').contains('Payment Purpose')
+        if (PaymentPurpose != null) {
+            cy.get('.ant-select-selection-search').eq(3).click()
+            cy.get('.ant-select-dropdown').find('.ant-select-item-option-content').contains(PaymentPurpose).click({ force: true })
+        }
+    }
     clickAddRecipient() {
         cy.get('#submit').should('exist').and('contain.text', 'Add Recipient').click()
     }
@@ -117,6 +148,12 @@ export class RecipientListPage {
         cy.get('.ant-modal-body').should('exist').and('contain.text', 'Recipient Added')
         cy.get('.ant-btn-primary').contains('Return To Dashboard').click()
         cy.url().should('include', '/payments/dashboard')
+    }
+    gotoPayRecipient() {
+        cy.get('.ant-modal-body').should('exist').and('contain.text', 'Recipient Added')
+        cy.get('.ant-btn-primary').contains('Pay This Recipient').click()
+        cy.url().should('include', 'payments/new-payment')
+        cy.get('.ant-spin-dot').should('not.exist')
     }
 
     validateToast(message) {
@@ -133,6 +170,13 @@ export class RecipientListPage {
     validateRecipientCountryFieldError(message) {
         cy.get('.ant-form-item-explain-error').should('be.visible').and('contain.text', message)
 
+    }
+    validateCLABEError() {
+        cy.get('.ant-notification-notice-error.ant-notification-notice-closable').should('be.visible')
+            .and('contain.text', 'Error Code: 451CLABE is missing')
+    }
+    ValidatePaymentPurposeError(message) {
+        cy.get('#crossBorderPurposeCode_help > ').should('be.visible').and('contain.text', message)
     }
     ValidatePayButton() {
         cy.get('.ant-table-tbody > tr td:nth-child(5)').eq(0).should('exist')
@@ -176,17 +220,17 @@ export class RecipientListPage {
         cy.url().should('include', '/payments/recipient-list/recipient-details')
         cy.get('.ant-col-24.m-b-10').should('be.visible').and('contain.text', 'Recipient Details')
     }
-    ValidateCity(){
-        return cy.get('.ant-col.ant-form-item-label').contains('City').then(cityfield =>{
-        const cityindex = cityfield.toArray().findIndex(el => el === cityfield[0])
-        return cityindex
-       })
+    ValidateCity() {
+        return cy.get('.ant-col.ant-form-item-label').contains('City').then(cityfield => {
+            const cityindex = cityfield.toArray().findIndex(el => el === cityfield[0])
+            return cityindex
+        })
     }
-    ValidateRecipientCountry(){
-      return cy.get('.ant-col.ant-form-item-label').contains('Recipient Country').then(countryfield => {
-        const countryindex =countryfield.toArray().findIndex(el => el === countryfield[1]);
-        return countryindex
-       })
+    ValidateRecipientCountry() {
+        return cy.get('.ant-col.ant-form-item-label').contains('Recipient Country').then(countryfield => {
+            const countryindex = countryfield.toArray().findIndex(el => el === countryfield[1]);
+            return countryindex
+        })
     }
 }
 
