@@ -3,8 +3,20 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   viewportWidth: 1280,  // Set your desired width
   viewportHeight: 720,  // Set your desired height
+  chromeWebSecurity: false,
   defaultCommandTimeout: 50000,
   pageLoadTimeout: 60000,
+  experimentalMemoryManagement: true,
+  reporter: 'cypress-mochawesome-reporter',
+  reporterOptions: {
+    charts: true,
+    reportPageTitle: 'Volopa Automation Report - [datetime]',
+    embeddedScreenshots: true,
+    inlineAssets: true,
+    saveAllAttempts: true,
+    reportFilename: "Report-[datetime]-report",
+    timestamp: "longDate"
+  },
   e2e: {
     baseUrl: 'https://uiredevelopment.volopa.com/',
     retries: {
