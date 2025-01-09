@@ -22,15 +22,23 @@ export class RecipientListPage {
         cy.url().should('include', '/payments/recipient-list/add-recipient')
         cy.get('.ant-col-24.m-b-10').should('be.visible').and('contain.text', 'Recipient Details')
     }
-    ValidateAddRecipient(country, currency) {
+    ValidateAddRecipient(country,currency) {
         cy.wait(6000)
         cy.get('.ant-col.ant-form-item-label').eq(0).should('be.visible').and('contain.text', 'Recipient Bank Country')
-        cy.get('#recipientBankCountry').should('not.be.disabled').type(country + '{enter}')
-        cy.get('.ant-select-item-option-active').should('contain.text', country)
+       cy.get('#recipientBankCountry').should('not.be.disabled').type(country +  '{enter}')
+      // cy.get('.ant-select-dropdown').find('.ant-select-item-option-content').eq(index).contains(country).click({ force: true })
+       cy.get('.ant-select-item-option-active').should('contain.text', country)
         cy.get('.ant-col.ant-form-item-label').eq(1).should('be.visible').and('contain.text', 'Recipient Currency')
         cy.get('#recipientCurrency').should('not.be.disabled').type(currency + '{enter}')
         cy.get('.ant-select-item-option-selected').eq(1).should('contain.text', currency)
     }
+    /*SelectCountrybyIndex(index){
+        cy.get('.ant-col.ant-form-item-label').eq(0).should('be.visible').and('contain.text', 'Recipient Bank Country')
+        cy.get('#recipientBankCountry').should('not.be.disabled').type(country +  '{enter}')
+        cy.get('.ant-select-item-option-active').should('contain.text', country)
+        cy.get('.ant-select-selection-search').eq(0).click()
+       cy.get('.ant-select-dropdown').find('.ant-select-item-option-content').contains(country).click({ force: true })
+    }*/
     AddEmailAddress(email) {
         cy.get('.ant-col.ant-form-item-label').contains('Recipient Email Address')
         if (email != null) {
@@ -90,6 +98,22 @@ export class RecipientListPage {
     AddRecipientType() {
         cy.get('.ant-col-xs-24 > .ant-space-vertical >').eq(0).should('be.visible').and('contain.text', 'Recipient Type')
         cy.get('.ant-space > :nth-child(2) > .ant-card').should('exist').and('contain.text', 'Business').click()
+    }
+    AddRecipientTypeIndividual(){
+        cy.get('.ant-col-xs-24 > .ant-space-vertical >').eq(0).should('be.visible').and('contain.text', 'Recipient Type')
+        cy.get('[style=""] > .ant-card > .ant-card-body').should('exist').and('contain.text', 'Individual').click()
+    }
+    AddFirstName(FirstName){
+        cy.get('.ant-col.ant-form-item-label').contains('First Name')
+        cy.get('#firstName').should('not.be.disabled').type(FirstName)
+    }
+    AddLastName(LastName){
+        cy.get('.ant-col.ant-form-item-label').contains('Last Name')
+        cy.get('#lastName').should('not.be.disabled').type(LastName)
+    }
+    AddRecipientDescription(Description){
+        cy.get('.ant-col.ant-form-item-label').contains('Recipient Nickname / Description')
+        cy.get('#descriprion').should('not.be.disabled').type(Description)
     }
     AddBusinessname(businessName) {
         cy.get('.ant-col.ant-form-item-label').contains('Business Name / Description')

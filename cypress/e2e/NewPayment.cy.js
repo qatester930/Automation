@@ -40,12 +40,12 @@ describe('New Payment Test Cases', () => {
     it('TC_NP-005-Verify that Funding Method Easy Transfer is not available for currencies other than GBP and Euro', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
     })
     it('TC_NP-006-Verify that FX rate is appearing and will refresh every 30 seconds.', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
         newpayment.ValidateFXRate()
     })
     it('TC_NP-007-User is able to navigate "Recipient List" on clicking the "View Details" button under the "Recipient Details" tag', () => {
@@ -56,28 +56,28 @@ describe('New Payment Test Cases', () => {
     it('TC_NP-008-Verify that user is able to pay the recipient (Not yapily flow - Currencies other than "Euro" and "GBP")', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
         newpayment.PayRecipient('new test')
 
     })
     it('TC_NP-009-  Verify that after paying the recipient, user is able to view the payment', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
         newpayment.PayRecipient('new test')
         newpayment.ViewPayment()
     })
     it('TC_NP-10-  Verify that after paying the recipient, user is able to proceed to a new payment', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
         newpayment.PayRecipient('new test')
         newpayment.NewPayment()
     })
     it('TC_NP-11-  Verify that after paying the recipient, user is able to proceed to return to apymnet dashboard', () => {
         newpayment.gotoNewPayment()
         newpayment.ValidateSearchBar('sad')
-        newpayment.ValidateFundingMethod('US','240')
+        newpayment.ValidateFundingMethod('US', '240')
         newpayment.PayRecipient('new test')
         newpayment.ReturntoDashboard()
     })
@@ -166,7 +166,7 @@ describe('New Payment Test Cases', () => {
         newpayment.EnabledPriorityButton()
         newpayment.DisabledRegularButton()
     })
-    it.only('TC_NP-16- Verify that Yapily flow journey and transaction is completed', () => {
+    it('TC_NP-16- Verify that Yapily flow journey and transaction is completed', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
         recipientlist.ValidateAddRecipient('UNITED STATES', 'US')
@@ -184,12 +184,12 @@ describe('New Payment Test Cases', () => {
         recipientlist.SelectRecipientCountry('UNITED STATES')
         recipientlist.clickAddRecipient()
         recipientlist.gotoPayRecipient()
-        newpayment.ValidateFundingMethod('EUR','240')
+        newpayment.ValidateFundingMethod('EUR', '240')
         newpayment.PayRecipient('new test')
         newpayment.gotoEasyTransfer()
         fundwallet.ValidateYapily('Modelo Sandbox')
-        fundwallet.gotoOzoneAPI(username,passWord)
+        fundwallet.gotoOzoneAPI(username, passWord)
         newpayment.validatePayment()
     })
-   
+
 })

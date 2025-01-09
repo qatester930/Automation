@@ -27,7 +27,7 @@ describe('Recipient List Test Cases', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
     })
-    it.only('TC_RL-004-Verify that user is able to add recipient', () => {
+    it('TC_RL-004-Verify that user is able to add recipient', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
         recipientlist.ValidateAddRecipient('UN', 'G', '')
@@ -82,12 +82,11 @@ describe('Recipient List Test Cases', () => {
         recipientlist.clickAddRecipient()
         recipientlist.validateToast('Please make sure you fill in the necessary fields')
     })
-
     it('TC_RL-007- clicking "Pay" button on Recipient List page, user navigates to New Payments page', () => {
         recipientlist.gotoRecipientList()
         recipientlist.ValidatePayButton()
     })
-    it.only('TC_RL-08- Verify that "Recipient Country" fields location is after City field and it is required only for recipients with-SEK to Sweden-DKK to Denmark-NOK to Norway', () => {
+    it('TC_RL-08- Verify that "Recipient Country" fields location is after City field and it is required only for recipients with-SEK to Sweden-DKK to Denmark-NOK to Norway', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
         recipientlist.ValidateAddRecipient('DENMARK', 'DKK', '')
@@ -114,7 +113,6 @@ describe('Recipient List Test Cases', () => {
         recipientlist.clickAddRecipient()
         recipientlist.validateRecipientCountryFieldError('Please select recipient country')
     })
-
     it('TC_RL-09-Verify that "Recipient Country" is a mandatory field for the users-SEK to Sweden-DKK to Denmark-NOK to Norway', () => {
         recipientlist.gotoRecipientList()
         recipientlist.gotoAddRecipient()
@@ -148,8 +146,6 @@ describe('Recipient List Test Cases', () => {
         recipientlist.gotoRecipientList()
         recipientlist.ValidateViewHistory()
     })
-
-
     it('TC_RL-13- Validate that the pagination arrow is working fine on "Recipient List" page', () => {
         recipientlist.gotoRecipientList()
         recipientlist.ValidatePaginationArrow()
