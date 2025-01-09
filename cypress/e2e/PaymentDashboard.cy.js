@@ -3,7 +3,7 @@
 import { SigninPage } from "../pageObject/SigninPage"
 import { PaymentDashboardPage } from "../pageObject/PaymentDashboardPage"
 const signinpage = new SigninPage;
-const payment= new PaymentDashboardPage;
+const payment = new PaymentDashboardPage;
 
 describe('Payment Dashboard Test Cases', () => {
     const userName = Cypress.config('users').user2.username
@@ -19,12 +19,10 @@ describe('Payment Dashboard Test Cases', () => {
     it('TC_PD-001-Verify that user landed on the Payments Dashboard page"', () => {
         payment.gotoPaymentDashboard()
     })
-
     it('TC_PD-002-Verify that user is redirecting to "Recipient List screen"', () => {
         payment.gotoPaymentDashboard()
         payment.gotoRecipientList()
     })
-
     it('TC_PD-003-Verify that user is redirecting to "New Payment screen"', () => {
         payment.gotoPaymentDashboard()
         payment.gotoNewPayment()
@@ -36,7 +34,6 @@ describe('Payment Dashboard Test Cases', () => {
     it('TC_PD-005-Verify that recent activities is appearing in the "Recent Activity" section', () => {
         payment.gotoPaymentDashboard()
     })
-
     it('TC_PD-006-Verify that repeated recipients are appearing in the "Frequent Recipients" section', () => {
         payment.gotoPaymentDashboard()
         payment.ValidateFrequentRecipients('sad')
@@ -49,17 +46,16 @@ describe('Payment Dashboard Test Cases', () => {
     it('TC_PD-008- Verify that recent payments are appearing in "Payment History" section', () => {
         payment.gotoPaymentDashboard()
         payment.validateRecentPayments()
-        })
+    })
     it('TC_PD-009- Verify that information on the Recent Activity section are accurate', () => {
-            payment.gotoPaymentDashboard()
-            payment.ValidateRecentActivity()
+        payment.gotoPaymentDashboard()
+        payment.ValidateRecentActivity()
     })
     it('TC_PD-10- "Repeat" button present on Payment Dashboard page  is diecting to New Payment page', () => {
         payment.gotoPaymentDashboard()
         payment.ValidateRepeatButton()
-})
+    })
 })
 
- 
 
-   
+

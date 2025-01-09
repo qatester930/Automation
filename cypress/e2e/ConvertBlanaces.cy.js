@@ -48,7 +48,7 @@ describe('Convert Balances test cases', () => {
         balances. CurencyConversion('USD','NZD','0')
        balances.DisaabledConvertButton()
     })
-    it.only('TC_CB-007- Verify that "convert more" button updated the company Payment table', ()=>{
+    it('TC_CB-007- Verify that "convert more" button updated the company Payment table', ()=>{
         balances.goToConvertBalances()
         balances. CurencyConversion('JPY','NZD','100')
         balances.EnabledConvertButton()

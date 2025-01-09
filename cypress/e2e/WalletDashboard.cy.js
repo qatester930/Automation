@@ -18,7 +18,6 @@ describe('Wallet Dashboard test cases', () => {
         signinpage.clickLogin()
         cy.url().should('include', '/wallet/dashboard')
     })
-
     it('TC_WD-001 - Validate Payment Dashboard Content', () => {
         dashboard.goToWalletDashboard()
         dashboard.viewAllFundingHistory()
@@ -67,7 +66,6 @@ describe('Wallet Dashboard test cases', () => {
             })
         })
     })
-
     it('TC_WD-006 - Validate convert balances,fund card,fund Payment navigations from Payment dashboard', () => {
         dashboard.goToWalletDashboard()
         dashboard.gotoFundWallet()
@@ -98,8 +96,4 @@ describe('Wallet Dashboard test cases', () => {
         dashboard.goToWalletDashboard()
         dashboard.RemoveCurrencies('EUR', 'USD')
     })
-
-
-
-
 })

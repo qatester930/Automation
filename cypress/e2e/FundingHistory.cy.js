@@ -2,7 +2,7 @@
 
 import { SigninPage } from "../pageObject/SigninPage"
 import { FundingHistoryPage } from "../pageObject/FundingHistoryPage";
-import{FundWalletPage} from "../pageObject/FundWalletPage";
+import { FundWalletPage } from "../pageObject/FundWalletPage";
 const signinpage = new SigninPage;
 const fundinghistory = new FundingHistoryPage;
 const fundwallet = new FundWalletPage;
@@ -15,7 +15,7 @@ describe('Funding History Test Cases', () => {
     const password = Cypress.config('users').user2.password
     const username = Cypress.config('ozoneAPIusers').Username
     const passWord = Cypress.config('ozoneAPIusers').Password
-  
+
 
     beforeEach(() => {
         cy.visit('/login')
@@ -60,15 +60,15 @@ describe('Funding History Test Cases', () => {
     })
     it('TC_FH-009-Verify that the user can repeat the transaction if it has "Manual Push fund" status ', () => {
         fundinghistory.gotoFundingHistory()
-       fundinghistory.RepeatManualPushFunds()
+        fundinghistory.RepeatManualPushFunds()
     })
     it('TC_FH-10-Verify that the user can repeat the transaction if it has "Easy Transfer" status ', () => {
         fundinghistory.gotoFundingHistory()
-       fundinghistory.RepeatEasyTransferFunds()
-       fundwallet.ValidateYapily('Modelo Sandbox')
-       fundwallet.gotoOzoneAPI(username,passWord)
-       fundwallet.validatePayment()
-       fundwallet.validateCurrentDate(5)
-    
+        fundinghistory.RepeatEasyTransferFunds()
+        fundwallet.ValidateYapily('Modelo Sandbox')
+        fundwallet.gotoOzoneAPI(username, passWord)
+        fundwallet.validatePayment()
+        fundwallet.validateCurrentDate(5)
+
     })
 })
