@@ -1,40 +1,53 @@
-Below is an improved version of the WalletdashboardPage.js file. This version uses an ES6 class to encapsulate page object methods and selectors, ensures consistent naming conventions, and leverages getter methods for reusable element selectors. Additionally, the methods include descriptive names and basic inline comments to explain their purpose. You can further customize selectors and assertions according to your application needs:
+Below is an improved version of what WalletdashboardPage.js might look like. This refactored code makes use of getter methods for element selectors, a clear class structure, and concise methods for common actions and verifications. Adjust the selectors and URLs as needed for your application:
 
 ------------------------------------------------------------
 class WalletDashboardPage {
-  // Define element getters to improve reusability and readability
-  get title() {
-    // Replace the selector with the appropriate locator for the dashboard title element
+  
+  // Getter for the wallet dashboard title element
+  get dashboardTitle() {
     return cy.get('[data-cy=wallet-dashboard-title]');
   }
-
-  get balance() {
-    // Replace the selector with the appropriate locator for the wallet balance element
+  
+  // Getter for the wallet balance element
+  get walletBalance() {
     return cy.get('[data-cy=wallet-balance]');
   }
-
-  get transferButton() {
-    // Replace the selector with the appropriate locator for the transfer button
-    return cy.get('[data-cy=transfer-button]');
+  
+  // Getter for the transaction list container element
+  get transactionList() {
+    return cy.get('[data-cy=transaction-list]');
   }
-
-  // Verify that the dashboard title contains the expected text
-  verifyTitle(expectedTitle) {
-    this.title.should('contain', expectedTitle);
+  
+  // Visits the wallet dashboard page
+  visit() {
+    cy.visit('/wallet-dashboard');
   }
-
-  // Check if the wallet balance is correctly displayed
-  verifyBalance(expectedBalance) {
-    this.balance.should('contain', expectedBalance);
+  
+  // Verifies that the dashboard title is visible and contains the expected text
+  verifyDashboardTitle(expectedTitle) {
+    this.dashboardTitle.should('be.visible')
+                       .and('contain.text', expectedTitle);
   }
-
-  // Click the transfer button to initiate a transfer
-  clickTransfer() {
-    this.transferButton.click();
+  
+  // Retrieves the wallet balance as a number after stripping currency symbols
+  getWalletBalance() {
+    return this.walletBalance.invoke('text')
+      .then(text => {
+        const balance = parseFloat(text.replace(/[^0-9.-]+/g, ''));
+        return balance;
+      });
+  }
+  
+  // Clicks a transaction in the list based on its index (default is zero if no index is provided)
+  clickTransactionByIndex(index = 0) {
+    this.transactionList
+      .find('li')
+      .eq(index)
+      .click();
   }
 }
 
-export default WalletDashboardPage;
+export default new WalletDashboardPage();
 ------------------------------------------------------------
 
-This refactoring takes advantage of modern JavaScript practices such as using class getters for encapsulating element selectors and clear method names that describe each action. It also sets a clear separation between element definitions and actions, making the code easier to maintain and extend in the future.
+This version organizes selectors as getters, reduces code repetition, and improves readability by clearly separating concerns (navigation, verification, and interactions). Adjust element selectors (using data-cy attributes in this example) to suit your application’s actual HTML structure.
