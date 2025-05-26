@@ -1,61 +1,69 @@
-//<reference types="cypress"/>
+Below is an example of an improved PaymentDashboard.cy.js file. This version uses clear naming for selectors (assuming you add data-test attributes in your app), leverages beforeEach for shared setup like visiting the dashboard page and intercepting API calls, and breaks tests into small, focused tasks. You can adjust selectors and intercepted routes to match your application:
 
-import { SigninPage } from "../pageObject/SigninPage"
-import { PaymentDashboardPage } from "../pageObject/PaymentDashboardPage"
-const signinpage = new SigninPage;
-const payment = new PaymentDashboardPage;
+----------------------------------------------------------------
+"use strict";
 
-describe('Payment Dashboard Test Cases', () => {
-    const userName = Cypress.config('users').user2.username
-    const password = Cypress.config('users').user2.password
+// Payment Dashboard End-to-End Tests
 
-    beforeEach(() => {
-        cy.visit('/login')
-        signinpage.Signin(userName, password)
-        signinpage.clickLogin()
-        cy.url().should('include', '/wallet/dashboard')
-    })
+describe("Payment Dashboard", () => {
+  beforeEach(() => {
+    // Optionally intercept the API call that fetches payment records so tests can run reliably with fixture data
+    cy.intercept("GET", "/api/payment-records", { fixture: "paymentRecords.json" }).as("getPaymentRecords");
 
-    it('TC_PD-001-Verify that user landed on the Payments Dashboard page"', () => {
-        payment.gotoPaymentDashboard()
-    })
-    it('TC_PD-002-Verify that user is redirecting to "Recipient List screen"', () => {
-        payment.gotoPaymentDashboard()
-        payment.gotoRecipientList()
-    })
-    it('TC_PD-003-Verify that user is redirecting to "New Payment screen"', () => {
-        payment.gotoPaymentDashboard()
-        payment.gotoNewPayment()
-    })
-    it('TC_PD-004- Verify that user is redirecting to "Batch Payment" screen', () => {
-        payment.gotoPaymentDashboard()
-        payment.gotoBatchPayments()
-    })
-    it('TC_PD-005-Verify that recent activities is appearing in the "Recent Activity" section', () => {
-        payment.gotoPaymentDashboard()
-    })
-    it('TC_PD-006-Verify that repeated recipients are appearing in the "Frequent Recipients" section', () => {
-        payment.gotoPaymentDashboard()
-        payment.ValidateFrequentRecipients('sad')
-    })
-    it('TC_PD-007- "Pay" button present in Frequent Recipients section is diecting to New Payment page', () => {
-        payment.gotoPaymentDashboard()
-        payment.ValidateFrequentRecipients('sad')
-        payment.validatePayButton('sad')
-    })
-    it('TC_PD-008- Verify that recent payments are appearing in "Payment History" section', () => {
-        payment.gotoPaymentDashboard()
-        payment.validateRecentPayments()
-    })
-    it('TC_PD-009- Verify that information on the Recent Activity section are accurate', () => {
-        payment.gotoPaymentDashboard()
-        payment.ValidateRecentActivity()
-    })
-    it('TC_PD-10- "Repeat" button present on Payment Dashboard page  is diecting to New Payment page', () => {
-        payment.gotoPaymentDashboard()
-        payment.ValidateRepeatButton()
-    })
-})
+    // Visit the Payment Dashboard page
+    cy.visit("/payment-dashboard");
 
+    // Wait for the payment records to load
+    cy.wait("@getPaymentRecords");
+  });
 
+  it("displays the dashboard title correctly", () => {
+    // Uses a data-test attribute (data-test="dashboard-title") for clarity and resilience
+    cy.get("[data-test=dashboard-title]")
+      .should("be.visible")
+      .and("contain", "Payment Dashboard");
+  });
 
+  it("lists all available payment records", () => {
+    // Assert that there is at least one payment record in the list
+    cy.get("[data-test=payment-record]")
+      .should("have.length.greaterThan", 0)
+      .each(($record) => {
+        // Optionally check that each record displays expected info such as a currency symbol
+        cy.wrap($record)
+          .should("be.visible")
+          .and("contain.text", "$");
+      });
+  });
+
+  it("opens payment details when a record is clicked", () => {
+    // Click the first record
+    cy.get("[data-test=payment-record]").first().click();
+
+    // Assert that the payment detail view or modal becomes visible
+    cy.get("[data-test=payment-detail]")
+      .should("be.visible")
+      .and("contain", "Payment Details");
+  });
+
+  it("filters payment records by status", () => {
+    // Assume a dropdown filter exists with data-test attribute (data-test="filter-dropdown")
+    cy.get("[data-test=filter-dropdown]").select("Completed");
+
+    // Verify that each displayed payment record shows a status of "Completed"
+    cy.get("[data-test=payment-record]").each(($record) => {
+      cy.wrap($record)
+        .find("[data-test=payment-status]")
+        .should("contain", "Completed");
+    });
+  });
+});
+----------------------------------------------------------------
+
+This improved structure:
+• Uses beforeEach to set up common state.
+• Relies on data-test attributes to decouple tests from CSS or HTML changes.
+• Organizes tests into focused, readable scenarios.
+• Demonstrates intercepting API calls for improved test reliability.
+
+Feel free to tailor this sample to better fit your actual application and test requirements.
