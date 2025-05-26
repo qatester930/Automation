@@ -1,63 +1,93 @@
-Below is an improved version of ConvertBalancesPage.js that follows the Page Object Model best practices, separates element selectors from actions, and provides clear, reusable methods. Adjust the selectors as necessary to match your application’s HTML/CSS identifiers:
-
-------------------------------------------------------------
 class ConvertBalancesPage {
   constructor() {
-    // Define selectors for page elements
-    this.amountInput = '[data-test="convert-amount-input"]';
-    this.currencyDropdown = '[data-test="currency-dropdown"]';
-    this.convertButton = '[data-test="convert-button"]';
+    // Define selectors used throughout this page object.
+    this.selectors = {
+      fromCurrency: "#fromCurrencySelect",
+      toCurrency: "#toCurrencySelect",
+      amountInput: "#amountInput",
+      convertButton: "#btnConvert",
+      conversionResult: "#conversionResult" // Assuming this element displays the conversion result.
+    };
   }
 
-  // Returns the amount input element
+  /**
+   * Gets the "from currency" select element.
+   * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+   */
+  getFromCurrency() {
+    return cy.get(this.selectors.fromCurrency);
+  }
+
+  /**
+   * Gets the "to currency" select element.
+   * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+   */
+  getToCurrency() {
+    return cy.get(this.selectors.toCurrency);
+  }
+
+  /**
+   * Gets the amount input field.
+   * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+   */
   getAmountInput() {
-    return cy.get(this.amountInput);
+    return cy.get(this.selectors.amountInput);
   }
 
-  // Returns the currency dropdown element
-  getCurrencyDropdown() {
-    return cy.get(this.currencyDropdown);
-  }
-
-  // Returns the convert button element
+  /**
+   * Gets the convert button element.
+   * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+   */
   getConvertButton() {
-    return cy.get(this.convertButton);
+    return cy.get(this.selectors.convertButton);
   }
 
-  // Enters a conversion amount into the input field
+  /**
+   * Gets the conversion result element.
+   * @returns {Cypress.Chainable<JQuery<HTMLElement>>}
+   */
+  getConversionResult() {
+    return cy.get(this.selectors.conversionResult);
+  }
+
+  /**
+   * Selects the desired option from the "from currency" dropdown.
+   * @param {string} currency - The currency to be selected.
+   */
+  selectFromCurrency(currency) {
+    this.getFromCurrency().select(currency);
+  }
+
+  /**
+   * Selects the desired option from the "to currency" dropdown.
+   * @param {string} currency - The currency to be selected.
+   */
+  selectToCurrency(currency) {
+    this.getToCurrency().select(currency);
+  }
+
+  /**
+   * Clears any existing value and enters a new amount.
+   * @param {number|string} amount - The amount to be entered.
+   */
   enterAmount(amount) {
-    return this.getAmountInput()
-      .clear()
-      .type(amount);
+    this.getAmountInput().clear().type(amount);
   }
 
-  // Selects a currency from the dropdown
-  selectCurrency(currency) {
-    return this.getCurrencyDropdown()
-      .select(currency);
+  /**
+   * Clicks on the convert button.
+   */
+  clickConvertButton() {
+    this.getConvertButton().click();
   }
 
-  // Clicks the convert button
-  clickConvert() {
-    return this.getConvertButton()
-      .click();
-  }
-
-  // Combines steps to perform the full conversion
-  performConversion(amount, currency) {
-    this.enterAmount(amount);
-    this.selectCurrency(currency);
-    this.clickConvert();
+  /**
+   * Verifies that the conversion result contains the expected text.
+   * @param {string} expectedText - The text expected to appear in the conversion result.
+   */
+  verifyConversionResult(expectedText) {
+    this.getConversionResult().should("contain.text", expectedText);
   }
 }
 
 export default ConvertBalancesPage;
-------------------------------------------------------------
-
-Key improvements made:
-1. Organized element selectors in the constructor so that they’re easy to update. 
-2. Separated element getters from action methods for better readability and easier debugging.
-3. Provided a high-level method (performConversion) to encapsulate the entire conversion process.
-4. Returned Cypress commands to allow for command chaining if needed in tests.
-
-This version should make your test scripts more maintainable and easier to understand.
