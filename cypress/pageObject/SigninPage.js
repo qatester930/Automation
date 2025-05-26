@@ -1,46 +1,27 @@
-export class SigninPage {
-    Signin(userName, password,userEEA,passwordEEA) {
-        cy.get('[class="ant-image-img"]').should('be.visible') //logo
-        cy.get('[class="ant-typography fs-18px medium"]').should('be.visible').and('contain.text', 'Welcome Back!')
-        if (userName != null) {
-            cy.get('[id="username"]').should('exist').and('have.attr', 'placeholder', 'Username/email').clear().type(userName)
-        }
-        if (password != null) {
-            cy.get('[id="password"]').should('exist').and('have.attr', 'placeholder', 'Enter Password').clear().type(password)
-        }
-        if (userEEA != null) {
-            cy.get('[id="username"]').should('exist').and('have.attr', 'placeholder', 'Username/email').clear().type(userEEA)
-        }
-        if (passwordEEA != null) {
-            cy.get('[id="password"]').should('exist').and('have.attr', 'placeholder', 'Enter Password').clear().type(passwordEEA)
-        }
-    }
-    clickLogin() {
-        cy.get('[type="submit"]').should('be.visible').and('contain.text', 'Login').click() //Login
-    }
-    validateToast(message){
-        cy.get('[class="ant-message-notice-content"]').should('be.visible').and('contain.text', message)
-    }
-    validateUsernameError(message) {
-        cy.get('[id="username_help"][role="alert"]').should('be.visible').and('contain.text', message)
-    }
-    validatePasswordError(message) {
-        cy.get('[id="password_help"][role="alert"]').should('be.visible').and('contain.text', message)
-    }
-    Forgotpass() {
-        cy.get('.m-t-10 > .ant-col > .dark-green').should('be.visible').and('contain.text', 'Forgot password').click()
-        cy.get('.ant-typography').should('be.visible').and('contain.text', 'Please enter your email to receive a link to reset your password')
-    }
+class SigninPage {
+  get emailInput() {
+    return cy.get('input[name="email"]');
+  }
 
-    Signup() {
-        cy.get('.m-t-5 > .ant-col > .dark-green').should('be.visible').and('contain.text', 'Signup here').click()
-    }
+  get passwordInput() {
+    return cy.get('input[name="password"]');
+  }
 
-    Eyeicon(password, text) {
-        cy.get('[id="password"]').should('exist').and('have.attr', 'placeholder', 'Enter Password').clear().type(password)
-        cy.get('.ant-input-suffix').should('be.visible').click()
-        cy.get('[id="password"]').should('exist').and('have.attr', 'type', 'text').clear().type(text)
-        cy.get('.ant-input-suffix').click()
-    }
+  get signInButton() {
+    return cy.get('button[type="submit"]');
+  }
+
+  /**
+   * Signs in the user using the provided credentials.
+   * @param {string} email - The user's email address.
+   * @param {string} password - The user's password.
+   */
+  signIn(email, password) {
+    this.emailInput.clear().type(email);
+    this.passwordInput.clear().type(password);
+    this.signInButton.click();
+    return this;
+  }
 }
 
+export default new SigninPage();

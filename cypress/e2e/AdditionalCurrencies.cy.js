@@ -1,57 +1,64 @@
-Below is an improved version of the AdditionalCurrencies.cy.js file. In this version the test suite uses clear naming, consistent arrow functions, and centralized selectors to reduce duplication. It also leverages beforeEach to set the base state and includes comments to clarify each step. (Note: adjust URLs, selectors, and test cases as needed to match your application.)
+Below is an improved version of the file that follows best practices such as extracting selectors into data attributes, using beforeEach for consistent setup, and clear separation of concerns. Adjust the selectors and expected values as needed for your application:
 
-────────────────────────────
 "use strict";
 
-// Centralized selectors for additional currency features
-const SELECTORS = {
-  currencySelector: "[data-test='currency-selector']",
-  currencyItem: "[data-test='currency-item']",
-  selectedCurrency: "[data-test='selected-currency']"
-};
-
-describe("Additional Currencies", () => {
-  
-  // Visit the homepage (or the relevant page) before each test
+describe('Additional Currencies Conversion', () => {
+  // Visit the homepage (or the page under test) before each test case.
   beforeEach(() => {
-    cy.visit("/"); 
+    cy.visit('/');
   });
 
-  it("should display the currency selector and at least one currency option", () => {
-    // Check that the currency selector exists
-    cy.get(SELECTORS.currencySelector).should("exist");
+  // Define an array of currency objects containing identifiers and expected rates.
+  // You can update the expected values to match your real test data.
+  const currencies = [
+    { id: 'eur', name: 'EUR', expectedRate: '0.85' },
+    { id: 'gbp', name: 'GBP', expectedRate: '0.75' },
+    { id: 'jpy', name: 'JPY', expectedRate: '110' }
+  ];
 
-    // Expand the selector if needed (optional step depending on UI logic)
-    cy.get(SELECTORS.currencySelector).click();
+  // Verify that each additional currency displays correctly.
+  currencies.forEach(currency => {
+    it(`should display the correct conversion rate for ${currency.name}`, () => {
+      // Use data-cy attributes for selecting elements.
+      cy.get(`[data-cy=currency-${currency.id}]`).should('exist').and('be.visible');
 
-    // Verify that the list of currencies is not empty
-    cy.get(SELECTORS.currencyItem).its("length").should("be.gt", 0);
+      // Check that the conversion rate is correct.
+      cy.get(`[data-cy=currency-${currency.id}] .rate`)
+        .invoke('text')
+        .then(text => {
+          // Trim any extra whitespace and compare the text to the expected value.
+          expect(text.trim()).to.eq(currency.expectedRate);
+        });
+    });
   });
 
-  it("should allow the user to select an additional currency", () => {
-    // Open the currency selector menu
-    cy.get(SELECTORS.currencySelector).click();
+  // Test that refreshing the page updates the conversion rates.
+  it('should update conversion rates when the refresh button is clicked', () => {
+    // Click the refresh button using its data-cy attribute.
+    cy.get('[data-cy=refresh-button]').click();
 
-    // Here, we assume that selecting "EUR" is part of the test.
-    // Update the value to match an actual currency label in your app.
-    const targetCurrency = "EUR";
-    cy.contains(SELECTORS.currencyItem, targetCurrency).click();
+    // If necessary, wait for the UI to refresh. Adjust the waiting strategy according to your app's behavior.
+    cy.wait(500);
 
-    // Verify that the selected currency was updated on the UI.
-    cy.get(SELECTORS.selectedCurrency)
-      .should("exist")
-      .and("contain", targetCurrency);
+    // Validate that each currency rate is updated correctly.
+    currencies.forEach(currency => {
+      cy.get(`[data-cy=currency-${currency.id}] .rate`)
+        .invoke('text')
+        .then(text => {
+          // Optionally, parse the rate and ensure it is a valid number greater than zero.
+          const rate = parseFloat(text.trim());
+          expect(rate).to.be.a("number");
+          expect(rate).to.be.greaterThan(0);
+        });
+    });
   });
-
-  // Additional tests for currency functionality can be added here.
-  
 });
-────────────────────────────
 
-Key improvements and practices included:
-• Using a selectors object (SELECTORS) to centralize locating elements. This reduces duplication and eases maintenance if selectors change.
-• Utilizing beforeEach to set up a consistent starting point.
-• Using clear test descriptions so that the output is easy to read and understand.
-• Favoring arrow functions and strict mode for modern JavaScript best practices.
+A few additional tips:
 
-Feel free to adjust the URL (cy.visit("/")) or any of the data-test selectors to fit your exact application context.
+1. Use data attributes (like data-cy) for selectors so that your tests remain resilient to UI changes.
+2. Adjust the cy.wait() duration or replace it with more robust waiting (e.g., intercepting API calls) if needed.
+3. If you have common actions across tests (like refreshing rates), consider creating custom Cypress commands.
+4. Organize your test data (currencies in this case) so that updating expected values requires changes in just one location.
+
+This improved code should help maintain readability, scalability, and stability over time.

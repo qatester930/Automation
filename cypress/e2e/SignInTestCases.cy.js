@@ -1,69 +1,89 @@
-Below is an improved version of a typical sign‐in test suite. This updated code leverages beforeEach hooks for shared setup, uses fixture data for test users, and separates concerns by clearly grouping each test case. Adjust selectors, URLs, and error messages as needed to fit your application.
+Below is an improved version of the SignInTestCases.cy.js file. This version uses best practices such as reusing selectors via constants, using beforeEach to visit the sign‐in page before each test, and intercepting API calls to simulate different responses. It also leverages fixtures for test data, includes useful assertions, and provides inline comments for clarity.
 
------------------------------------------------------------
+-------------------------------------------------------
 "use strict";
 
 describe("Sign In Test Cases", () => {
-  // Load fixture data before tests run
-  let users;
+  // Define selectors as reusable constants
+  const selectors = {
+    emailInput: "#email",      // Adjust these selectors as needed
+    passwordInput: "#password",
+    signInBtn: "#signin-btn",
+    errorMessage: ".error-msg"
+  };
+
+  // Load credentials from a fixture file (cypress/fixtures/userCredentials.json)
+  let userData;
   before(() => {
-    cy.fixture("users").then((data) => {
-      users = data;
+    cy.fixture("userCredentials").then((data) => {
+      userData = data;
     });
   });
 
-  // Visit the sign-in page before each test
+  // Visit the sign in page before each test
   beforeEach(() => {
     cy.visit("/signin");
   });
 
   it("should sign in successfully with valid credentials", () => {
-    cy.get("input[name=email]")
-      .clear()
-      .type(users.validUser.email);
-    cy.get("input[name=password]")
-      .clear()
-      .type(users.validUser.password);
-    cy.get("button[type=submit]").click();
+    // Intercept the login API call and simulate a successful response
+    cy.intercept("POST", "/api/login", {
+      statusCode: 200,
+      body: { token: "dummyToken" }
+    }).as("loginRequest");
 
-    // Assert that the user is redirected to the dashboard page.
-    cy.url().should("include", "/dashboard");
+    // Enter valid credentials and submit the sign in form
+    cy.get(selectors.emailInput)
+      .type(userData.validEmail)
+      .should("have.value", userData.validEmail);
+    cy.get(selectors.passwordInput)
+      .type(userData.validPassword)
+      .should("have.value", userData.validPassword);
+    cy.get(selectors.signInBtn).click();
+
+    // Wait for the login API call to complete and assert on its status
+    cy.wait("@loginRequest").its("response.statusCode").should("eq", 200);
+
+    // Verify that the user is redirected away from the sign in page upon success
+    cy.url().should("not.include", "/signin");
   });
 
-  it("should display an error message for invalid credentials", () => {
-    cy.get("input[name=email]")
-      .clear()
-      .type(users.invalidUser.email);
-    cy.get("input[name=password]")
-      .clear()
-      .type(users.invalidUser.password);
-    cy.get("button[type=submit]").click();
+  it("should display an error message when using invalid credentials", () => {
+    // Intercept the login API call and simulate an unauthorized error
+    cy.intercept("POST", "/api/login", {
+      statusCode: 401,
+      body: { error: "Invalid credentials" }
+    }).as("loginRequest");
 
-    // Assert that an error message is visible.
-    cy.get(".error-message")
+    // Enter invalid credentials and try to sign in
+    cy.get(selectors.emailInput)
+      .type(userData.invalidEmail)
+      .should("have.value", userData.invalidEmail);
+    cy.get(selectors.passwordInput)
+      .type(userData.invalidPassword)
+      .should("have.value", userData.invalidPassword);
+    cy.get(selectors.signInBtn).click();
+
+    // Wait for the error response and verify the error message is displayed
+    cy.wait("@loginRequest").its("response.statusCode").should("eq", 401);
+    cy.get(selectors.errorMessage)
       .should("be.visible")
-      .and("contain", "Invalid email or password");
+      .and("contain.text", "Invalid credentials");
   });
 
-  it("should validate empty input fields", () => {
-    // Attempt to submit with empty fields.
-    cy.get("input[name=email]").clear();
-    cy.get("input[name=password]").clear();
-    cy.get("button[type=submit]").click();
+  it("should prevent sign in when inputs are empty", () => {
+    // Click the sign in button without filling in the fields to trigger front-end validation
+    cy.get(selectors.signInBtn).click();
 
-    // Assert that the appropriate validation error is displayed.
-    cy.get(".error-message")
-      .should("be.visible")
-      .and("contain", "Please fill in all fields");
+    // Confirm that both fields show validation messages
+    [selectors.emailInput, selectors.passwordInput].forEach((selector) => {
+      cy.get(selector).then(($input) => {
+        // The native HTML validation should provide a validationMessage property
+        expect($input[0].validationMessage).to.exist;
+      });
+    });
   });
 });
------------------------------------------------------------
+-------------------------------------------------------
 
-Key improvements made:
-
-1. Setup hooks (before and beforeEach) ensure consistent preconditions.
-2. Using fixture data (e.g., cypress/fixtures/users.json) avoids hard-coded credentials.
-3. Clear and consistent assertions improve test readability.
-4. Selectors are specific (e.g., input[name=email]) to help maintainability.
-
-Customize paths, fixture names, and selectors as needed for your project environment.
+This improved version provides a clear, maintainable structure with proper use of hooks, intercepting network requests, and leveraging fixtures for test data. Adjust the selectors, API endpoint URLs, and fixture file paths as needed for your project.

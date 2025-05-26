@@ -1,57 +1,65 @@
-Below is an example of an improved and refactored version of your FundWallet.cy.js file. This version assumes you’re testing the wallet funding flow on your web app, and it uses best practices such as:
+Below is an improved version of a typical FundWallet test file. In this updated code, redundant actions have been abstracted into beforeEach / custom commands (assuming you have a “cy.login()” command implemented), meaningful selectors or constants are used instead of hard-coded strings wherever possible, and the tests include descriptive assertions for both positive and negative scenarios. You can adjust the selectors and commands to match your application’s DOM and workflow.
 
-• Using beforeEach to centralize repetitive actions (like visiting the page)
-• Locating elements via data-test attributes rather than relying solely on classes or tag selectors, which improves test stability
-• Adding assertions to confirm that elements are visible before interacting with them
-• Keeping the test focused and clear about what it’s verifying
+------------------------------------------------------------
+"use strict";
 
-If your original file looks roughly like this:
-
--------------------------------------------------------------
 describe("Fund Wallet", () => {
-  it("should allow user to fund their wallet", () => {
-    cy.visit("https://example.com");
-    cy.get("input[name='amount']").type("100");
-    cy.get("button.fund").click();
-    cy.contains("Wallet funded successfully").should("be.visible");
-  });
-});
--------------------------------------------------------------
+  // Use constants to avoid magic numbers/strings
+  const validAmount = 100;
+  const invalidAmount = -50;
+  const selectors = {
+    fundWalletButton: "button:contains('Fund Wallet')",
+    amountInput: "input[name='amount']",
+    submitButton: "button:contains('Submit')",
+    notification: ".notification",
+    errorMessage: ".error-message"
+  };
 
-You might update it to the following improved version:
-
--------------------------------------------------------------
-describe("Fund Wallet", () => {
-  // Runs before each test in the block
+  // Log in and navigate to the home page before each test
   beforeEach(() => {
-    // Visit the dashboard or home page where the wallet funding component exists
     cy.visit("/");
+    // Assuming there's a custom command for logging in
+    cy.login();
   });
 
-  it("successfully funds the wallet", () => {
-    // Ensure the wallet funding input is visible and type in the amount.
-    cy.get("[data-test=amount-input]")
-      .should("be.visible")
-      .type("100");
+  it("Funds the wallet when given a valid amount", () => {
+    // Open the fund wallet modal/page
+    cy.get(selectors.fundWalletButton).click();
 
-    // Click the button to fund the wallet
-    cy.get("[data-test=fund-button]")
-      .should("be.enabled")
-      .click();
+    // Fill in the wallet amount
+    cy.get(selectors.amountInput).clear().type(validAmount.toString());
 
-    // Confirm the success notification is visible and contains the expected message
-    cy.get("[data-test=success-message]")
+    // Submit the form
+    cy.get(selectors.submitButton).click();
+
+    // Validate that a success notification appears
+    cy.get(selectors.notification)
       .should("be.visible")
       .and("contain", "Wallet funded successfully");
   });
+
+  it("Displays an error when given an invalid amount", () => {
+    // Open the fund wallet modal/page
+    cy.get(selectors.fundWalletButton).click();
+
+    // Enter an invalid amount
+    cy.get(selectors.amountInput).clear().type(invalidAmount.toString());
+
+    // Submit the form
+    cy.get(selectors.submitButton).click();
+
+    // Validate that an appropriate error message is shown
+    cy.get(selectors.errorMessage)
+      .should("be.visible")
+      .and("contain", "Invalid amount");
+  });
 });
--------------------------------------------------------------
+------------------------------------------------------------
 
-Key improvements in this version:
+This improved version uses:
+• Descriptive test names that clearly state what each test checks.
+• A beforeEach hook for common setup (visiting the page and logging in), reducing duplication.
+• Constants and a selectors object to avoid repeated hard-coded selectors.
+• Assertions that verify both successful fund wallet operations as well as error handling for invalid input.
 
-1. Modular Setup: The beforeEach hook avoids code duplication by visiting the required page before each test.
-2. Robust Element Selectors: The selectors now use data-test attributes (e.g., data-test=amount-input) which decouple tests from CSS changes.
-3. Assertion Enhancements: Added checks (like should("be.visible") and should("be.enabled")) ensure interaction only happens with elements in the expected state.
-4. Clear and Self-Documenting: Each test step includes comments clarifying its purpose, which is particularly helpful for maintenance and collaboration.
-
-Feel free to adjust the selectors (data-test attributes) and URL paths as needed to match your application’s actual implementation.
+You can further improve by refining selectors (e.g., adding data attributes in your app if needed) and adding more tests (e.g., edge cases or verifying changes in wallet balance) to ensure robust coverage.
