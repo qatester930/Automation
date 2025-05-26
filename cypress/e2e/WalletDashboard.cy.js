@@ -1,66 +1,69 @@
-Below is one example of how you might refactor and improve your WalletDashboard.cy.js file. In this version, we extract URL and element selectors into constants, leverage beforeEach for shared setup, and write clear, modular tests. (Note that without the original file it’s hard to be exact; adjust the selectors and URL as needed for your application.)
-
---------------------------------------------------------------
-"use strict";
-
-const WALLET_URL = "/wallet";
-
-// Element selectors using data attributes for a more robust approach
-const SELECTORS = {
-  balance: "[data-cy='wallet-balance']",
-  copyAddressButton: "[data-cy='copy-address']",
-  alertMessage: "[data-cy='alert-message']"
-};
-
-describe("Wallet Dashboard", () => {
-  
-  // Runs once before all tests in the block
-  before(() => {
-    // If your application requires any authentication or state initialization, do it here.
-    // For example:
-    // cy.login(); 
-  });
-  
-  // Runs before each test case to ensure a fresh state
+// Improved Cypress tests for Wallet Dashboard
+describe('Wallet Dashboard', () => {
+  // Runs before each test to visit the dashboard page.
   beforeEach(() => {
-    cy.visit(WALLET_URL);
+    // Adjust the URL as needed for your application
+    cy.visit('/wallet-dashboard');
   });
-  
-  it("displays the wallet balance", () => {
-    // Validate that the balance element is visible and contains a valid dollar amount.
-    cy.get(SELECTORS.balance)
-      .should("be.visible")
-      .invoke("text")
-      .then((balanceText) => {
-        // Adjust the regex based on what a valid balance should look like
-        expect(balanceText.trim()).to.match(/^\$/);
+
+  // Verify that the wallet overview renders correctly
+  it('should display the wallet overview', () => {
+    cy.contains('Wallet Overview').should('be.visible');
+    cy.get('.wallet-balance')
+      .should('exist')
+      .and('not.be.empty');
+  });
+
+  // Test the deposit functionality
+  it('should allow the user to deposit funds', () => {
+    // Click on the Deposit button and fill out the deposit form
+    cy.get('button').contains('Deposit').click();
+    cy.get('input[name="amount"]').type('100');
+    cy.get('button').contains('Confirm').click();
+
+    // Validate that the deposit action was successful
+    cy.contains('Deposit successful').should('be.visible');
+  });
+
+  // Test the withdrawal functionality
+  it('should allow the user to withdraw funds', () => {
+    // Click on the Withdraw button and fill out the withdraw form
+    cy.get('button').contains('Withdraw').click();
+    cy.get('input[name="amount"]').type('50');
+    cy.get('button').contains('Confirm').click();
+
+    // Validate that the withdraw action was successful
+    cy.contains('Withdrawal successful').should('be.visible');
+  });
+
+  // Verify that the transaction history is visible and contains at least one record
+  it('should show transaction history', () => {
+    cy.get('.transaction-history')
+      .should('be.visible')
+      .within(() => {
+        // Assumes that the history is rendered in table rows
+        cy.get('tr').its('length').should('be.gte', 1);
       });
   });
-  
-  it("allows the user to copy the wallet address", () => {
-    // Click the copy address button
-    cy.get(SELECTORS.copyAddressButton).should("be.visible").click();
-    
-    // Validate that an alert is displayed with copy confirmation
-    cy.get(SELECTORS.alertMessage)
-      .should("be.visible")
-      .and("contain", "Copied");
-    
-    // Optionally, if your application has clipboard access support, you can verify 
-    // that the clipboard contains the expected address:
-    // cy.window().its('navigator.clipboard').invoke('readText').should('equal', expectedAddress);
+
+  // Test error handling for deposit with no amount
+  it('should prevent deposit when no amount is entered', () => {
+    cy.get('button').contains('Deposit').click();
+    // Directly clicking confirm without entering an amount
+    cy.get('button').contains('Confirm').click();
+
+    // Validation for proper error message
+    cy.contains('Please enter an amount').should('be.visible');
   });
-  
-  // Add more tests as needed, for example error handling or other dashboard interactions
-  
+
+  // Test error handling for withdrawing more than the available balance
+  it('should show an error when attempting to withdraw more than the available balance', () => {
+    cy.get('button').contains('Withdraw').click();
+    // Type an excessively high number to simulate insufficient funds
+    cy.get('input[name="amount"]').type('1000000');
+    cy.get('button').contains('Confirm').click();
+
+    // Validate that the error message is displayed
+    cy.contains('Insufficient funds').should('be.visible');
+  });
 });
---------------------------------------------------------------
-
-Key improvements in this version include:
-
-1. Using constants to manage URLs and selectors. This makes the tests easier to maintain if these values change.
-2. Employing data-cy (or similar data attribute) selectors rather than relying solely on classes or IDs. This approach makes the tests less brittle.
-3. Structuring the tests with clear before, beforeEach, and describe blocks so that setup and teardown logic is organized.
-4. Including inline comments to guide future developers through what each section is doing.
-
-Adjust the selectors, URLs, and any additional setup (like authentication) to fit your application’s requirements.
