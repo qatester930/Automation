@@ -1,50 +1,41 @@
-Below is an improved version of a typical cypress.config.js file. This version uses the defineConfig helper for type safety and maintainability, organizes settings into logical sections (such as baseUrl, viewport, and retries), and includes an example custom task registration in the setupNodeEvents callback. You can adjust the values and tasks to suit your project needs:
-
-────────────────────────────────────────────
-const { defineConfig } = require('cypress');
+const { defineConfig } = require("cypress");
 
 module.exports = defineConfig({
   e2e: {
-    // Configure end-to-end testing options
-    baseUrl: 'http://localhost:3000', // Update this URL to match your environment
-    specPattern: 'cypress/e2e/**/*.{js,jsx,ts,tsx}',
-    supportFile: 'cypress/support/index.js',
+    // Set the base URL, using an environment variable if available.
+    baseUrl: process.env.BASE_URL || "http://localhost:3000",
 
-    // Register Node event listeners and custom tasks
+    // Match any test file with the proper extension in the e2e directory.
+    specPattern: "cypress/e2e/**/*.{js,jsx,ts,tsx}",
+
+    // Specify the support file. Remove or update this if not needed.
+    supportFile: "cypress/support/e2e.js",
+
+    // Configure Node event listeners.
     setupNodeEvents(on, config) {
-      // Example: add a custom logging task
-      on('task', {
-        log(message) {
-          console.log(message);
-          return null;
-        }
-      });
+      // Example: integrate custom tasks or plugins.
+      // require("./cypress/plugins/index.js")(on, config);
 
-      // Additional Node event registrations can go here
-
-      // Return the updated config object
+      // Return the modified config object.
       return config;
     }
   },
 
-  // Global settings for the test runner interface
+  // Set default viewport dimensions for tests.
   viewportWidth: 1280,
   viewportHeight: 720,
+
+  // Increase the default command timeout if necessary.
   defaultCommandTimeout: 8000,
 
-  // Configure test retries
+  // Define custom environment variables. These can be used in tests via Cypress.env().
+  env: {
+    login_url: "/login"
+  },
+
+  // Enable test retries in run mode if tests are occasionally flaky.
   retries: {
     runMode: 2,
     openMode: 0
   }
 });
-────────────────────────────────────────────
-
-Key improvements and best practices include:
-
-1. Using defineConfig for cleaner configuration and type-checking.
-2. Organizing configuration settings into logical sections (e.g., e2e options, global viewport settings, and retries).
-3. Providing detailed inline comments for clarity.
-4. Including an example custom task registration inside setupNodeEvents for potential logging or additional tasks.
-
-This file structure makes it easier to maintain and extend your Cypress configuration as your project grows.
