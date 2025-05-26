@@ -1,69 +1,69 @@
-Below is an example of an improved PaymentDashboard.cy.js file. This version uses clear naming for selectors (assuming you add data-test attributes in your app), leverages beforeEach for shared setup like visiting the dashboard page and intercepting API calls, and breaks tests into small, focused tasks. You can adjust selectors and intercepted routes to match your application:
+Below is an improved version of a sample PaymentDashboard.cy.js test file. This version uses descriptive selectors (using data attributes), separates test hooks for clarity, and chains assertions for more concise checks. Adapt the selectors and test logic to match your application’s specifics:
 
-----------------------------------------------------------------
-"use strict";
+------------------------------------------------------------
+describe('Payment Dashboard', () => {
+  // Run once before all tests – for any one-time setup, such as logging in or setting API state
+  before(() => {
+    // For example, log in if needed:
+    // cy.login();
+    // Navigate to the dashboard page
+    cy.visit('/dashboard');
+  });
 
-// Payment Dashboard End-to-End Tests
-
-describe("Payment Dashboard", () => {
+  // Ensure the dashboard is ready before each test
   beforeEach(() => {
-    // Optionally intercept the API call that fetches payment records so tests can run reliably with fixture data
-    cy.intercept("GET", "/api/payment-records", { fixture: "paymentRecords.json" }).as("getPaymentRecords");
-
-    // Visit the Payment Dashboard page
-    cy.visit("/payment-dashboard");
-
-    // Wait for the payment records to load
-    cy.wait("@getPaymentRecords");
+    // Optionally reload the page to start fresh
+    cy.reload();
+    // Wait until the main dashboard component is visible
+    cy.get('[data-cy=payment-dashboard]', { timeout: 10000 }).should('be.visible');
   });
 
-  it("displays the dashboard title correctly", () => {
-    // Uses a data-test attribute (data-test="dashboard-title") for clarity and resilience
-    cy.get("[data-test=dashboard-title]")
-      .should("be.visible")
-      .and("contain", "Payment Dashboard");
+  it('should display the payments table', () => {
+    // Verify the payments table exists and is visible
+    cy.get('[data-cy=payments-table]')
+      .should('exist')
+      .and('be.visible');
   });
 
-  it("lists all available payment records", () => {
-    // Assert that there is at least one payment record in the list
-    cy.get("[data-test=payment-record]")
-      .should("have.length.greaterThan", 0)
-      .each(($record) => {
-        // Optionally check that each record displays expected info such as a currency symbol
-        cy.wrap($record)
-          .should("be.visible")
-          .and("contain.text", "$");
+  it('should filter payments by status', () => {
+    // Select a payment status from a filter dropdown
+    cy.get('[data-cy=status-filter]').select('Completed');
+    // Verify that all rows in the table show the "Completed" status
+    cy.get('[data-cy=payments-table]')
+      .find('tr')
+      .each(($row) => {
+        cy.wrap($row)
+          .find('[data-cy=payment-status]')
+          .should('contain.text', 'Completed');
       });
   });
 
-  it("opens payment details when a record is clicked", () => {
-    // Click the first record
-    cy.get("[data-test=payment-record]").first().click();
-
-    // Assert that the payment detail view or modal becomes visible
-    cy.get("[data-test=payment-detail]")
-      .should("be.visible")
-      .and("contain", "Payment Details");
-  });
-
-  it("filters payment records by status", () => {
-    // Assume a dropdown filter exists with data-test attribute (data-test="filter-dropdown")
-    cy.get("[data-test=filter-dropdown]").select("Completed");
-
-    // Verify that each displayed payment record shows a status of "Completed"
-    cy.get("[data-test=payment-record]").each(($record) => {
-      cy.wrap($record)
-        .find("[data-test=payment-status]")
-        .should("contain", "Completed");
+  it('should display payment details upon clicking a payment row', () => {
+    // Click the first row in the payments table
+    cy.get('[data-cy=payments-table]')
+      .find('tr')
+      .first()
+      .click();
+    // Verify that the payment details section appears with expected elements
+    cy.get('[data-cy=payment-details]').within(() => {
+      cy.get('[data-cy=payment-amount]').should('exist').and('be.visible');
+      cy.get('[data-cy=payment-date]').should('exist').and('be.visible');
+      cy.get('[data-cy=payment-status]').should('exist').and('be.visible');
     });
   });
+
+  // Optionally, add an after hook if any cleanup is required:
+  after(() => {
+    // For example, log out or clear app state if needed
+    // cy.logout();
+  });
 });
-----------------------------------------------------------------
+------------------------------------------------------------
 
-This improved structure:
-• Uses beforeEach to set up common state.
-• Relies on data-test attributes to decouple tests from CSS or HTML changes.
-• Organizes tests into focused, readable scenarios.
-• Demonstrates intercepting API calls for improved test reliability.
+Key Improvements:
+• Consistent use of data attributes (e.g., [data-cy=...]) that make selectors robust against UI changes.
+• Clear separation of before, beforeEach, and after hooks ensures proper test setup and teardown.
+• Chained assertions provide cleaner and more readable test cases.
+• The structure is modular, making it easy to add additional tests or modify existing ones.
 
-Feel free to tailor this sample to better fit your actual application and test requirements.
+Adapt this sample to fit your actual application and testing needs.
