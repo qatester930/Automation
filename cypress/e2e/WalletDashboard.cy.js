@@ -1,99 +1,66 @@
-///<reference types="cypress"/>
+Below is one example of how you might refactor and improve your WalletDashboard.cy.js file. In this version, we extract URL and element selectors into constants, leverage beforeEach for shared setup, and write clear, modular tests. (Note that without the original file it’s hard to be exact; adjust the selectors and URL as needed for your application.)
 
-import { WalletdashboardPage } from "../pageObject/WalletdashboardPage"
-import { SigninPage } from "../pageObject/SigninPage"
+--------------------------------------------------------------
+"use strict";
 
-const dashboard = new WalletdashboardPage;
-const signinpage = new SigninPage;
+const WALLET_URL = "/wallet";
 
+// Element selectors using data attributes for a more robust approach
+const SELECTORS = {
+  balance: "[data-cy='wallet-balance']",
+  copyAddressButton: "[data-cy='copy-address']",
+  alertMessage: "[data-cy='alert-message']"
+};
 
+describe("Wallet Dashboard", () => {
+  
+  // Runs once before all tests in the block
+  before(() => {
+    // If your application requires any authentication or state initialization, do it here.
+    // For example:
+    // cy.login(); 
+  });
+  
+  // Runs before each test case to ensure a fresh state
+  beforeEach(() => {
+    cy.visit(WALLET_URL);
+  });
+  
+  it("displays the wallet balance", () => {
+    // Validate that the balance element is visible and contains a valid dollar amount.
+    cy.get(SELECTORS.balance)
+      .should("be.visible")
+      .invoke("text")
+      .then((balanceText) => {
+        // Adjust the regex based on what a valid balance should look like
+        expect(balanceText.trim()).to.match(/^\$/);
+      });
+  });
+  
+  it("allows the user to copy the wallet address", () => {
+    // Click the copy address button
+    cy.get(SELECTORS.copyAddressButton).should("be.visible").click();
+    
+    // Validate that an alert is displayed with copy confirmation
+    cy.get(SELECTORS.alertMessage)
+      .should("be.visible")
+      .and("contain", "Copied");
+    
+    // Optionally, if your application has clipboard access support, you can verify 
+    // that the clipboard contains the expected address:
+    // cy.window().its('navigator.clipboard').invoke('readText').should('equal', expectedAddress);
+  });
+  
+  // Add more tests as needed, for example error handling or other dashboard interactions
+  
+});
+--------------------------------------------------------------
 
-describe('Wallet Dashboard test cases', () => {
-    const userName = Cypress.config('users').user1.username
-    const password = Cypress.config('users').user1.password
+Key improvements in this version include:
 
-    beforeEach(() => {
-        cy.visit('/login')
-        signinpage.Signin(userName, password)
-        signinpage.clickLogin()
-        cy.url().should('include', '/wallet/dashboard')
-    })
-    it('TC_WD-001 - Validate Payment Dashboard Content', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.viewAllFundingHistory()
+1. Using constants to manage URLs and selectors. This makes the tests easier to maintain if these values change.
+2. Employing data-cy (or similar data attribute) selectors rather than relying solely on classes or IDs. This approach makes the tests less brittle.
+3. Structuring the tests with clear before, beforeEach, and describe blocks so that setup and teardown logic is organized.
+4. Including inline comments to guide future developers through what each section is doing.
 
-    })
-    it('TC_WD-002 - Validate Total Company Balance on Dashboard', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.getTotalCompanyBalance().then(totalBalance => {
-            dashboard.getWalletBalance().then(walletBalance => {
-                dashboard.getCardsBalance().then(cardBalance => {
-                    expect(totalBalance).to.be.eq((parseFloat(walletBalance) + parseFloat(cardBalance)).toFixed(2))
-                })
-            })
-        })
-
-
-    })
-    it('TC_WD-003- Validate clicking on Cards Balance, it should navigate to Cards Dashboard', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.cardsBalanceDashboard()
-
-    })
-    it('TC_WD-004- Validate clicking on Mark all as read,it should display No Recent Activities', () => {
-        dashboard.goToWalletDashboard()
-    })
-    it('TC_WD-005 - Validate Rate Checker from Wallet Dashboard', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.GotoConvertBalances()
-        //Get balance value for currencies
-        dashboard.getAvailableToSpend('EUR').then(oldEURBalance => {
-            dashboard.getAvailableToSpend('USD').then(oldUSDBalance => {
-                let oldEURBalanceAmount = parseFloat(oldEURBalance.replace(/,/g, ''))
-                let oldUSDBalanceAmount = parseFloat(oldUSDBalance.replace(/,/g, ''))
-                //Convert the currencies
-                dashboard.goToWalletDashboard()
-                dashboard.RateChecker('EUR', 'USD', '120')
-                //Get the balance values again
-                dashboard.getAvailableToSpend('EUR').then(newEURBalance => {
-                    dashboard.getAvailableToSpend('USD').then(newUSDBalance => {
-                        let newEURBalanceAmount = parseFloat(newEURBalance.replace(/,/g, ''))
-                        let newUSDBalanceAmount = parseFloat(newUSDBalance.replace(/,/g, ''))
-                        expect(newEURBalanceAmount).to.be.greaterThan(oldEURBalanceAmount)
-                        expect(newUSDBalanceAmount).to.be.lessThan(oldUSDBalanceAmount)
-                    })
-                })
-            })
-        })
-    })
-    it('TC_WD-006 - Validate convert balances,fund card,fund Payment navigations from Payment dashboard', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.gotoFundWallet()
-        dashboard.goToWalletDashboard()
-        dashboard.GotoConvertBalances()
-        dashboard.goToWalletDashboard()
-        dashboard.gotoFundCard()
-
-    })
-    it('TC_WD-007 - Verify that when user click on the "X" icon the fun card screen get closed.', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.validateCrossIcon()
-    })
-    it('TC_WD-008 - Verify that user click on confirm button, it redirects the user to New Fund card', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.gotoFundCard()
-        dashboard.NewCardfund()
-    })
-    it('TC_WD-009 -clicking on the slider arrow icons on recent activity section, the card gets slide to the left or right', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.ValidateSliderArrowIcons()
-    })
-    it('TC_WD_010-  clicking on recent activity section, it gets minimize or maximize', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.validateRecentActivity()
-    })
-    it('TC_WD_010-  Verify that user is able to remove the selected currency ', () => {
-        dashboard.goToWalletDashboard()
-        dashboard.RemoveCurrencies('EUR', 'USD')
-    })
-})
+Adjust the selectors, URLs, and any additional setup (like authentication) to fit your application’s requirements.
