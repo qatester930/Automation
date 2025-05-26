@@ -1,56 +1,42 @@
-Below is an improved example of how RecipientListPage.js might be structured. In this version the methods and getters clearly express the page's functionality, and chaining of Cypress commands is used to increase readability and maintainability. You can adjust the selectors to match your application’s markup.
+"use strict";
 
---------------------------------------------------
 class RecipientListPage {
-  // Use getters for frequently accessed elements to reduce duplication
-  get addRecipientButton() {
-    return cy.get('button.add-recipient');
+  constructor() {
+    // Define selectors using data attributes for stability.
+    this.searchInput = () => cy.get('[data-test="recipient-search-input"]');
+    this.addRecipientButton = () =>
+      cy.get('[data-test="add-recipient-button"]');
+    this.recipientTable = () =>
+      cy.get('[data-test="recipient-table"]');
+    // Returns the delete button for a specific recipient row.
+    this.deleteButton = recipientName =>
+      cy.contains('[data-test="recipient-row"]', recipientName)
+        .find('[data-test="delete-recipient-button"]');
   }
 
-  get recipientNameInput() {
-    return cy.get('input#recipient-name');
+  // Enters text into the search field to filter recipients.
+  searchRecipient(recipientName) {
+    this.searchInput().should('be.visible').clear().type(recipientName);
+    return this;
   }
 
-  get searchRecipientInput() {
-    return cy.get('input.search-recipient');
-  }
-
-  get recipientListItems() {
-    return cy.get('.recipient-list-item');
-  }
-
-  // Actions
+  // Clicks the button to add a new recipient.
   clickAddRecipient() {
-    this.addRecipientButton.click();
+    this.addRecipientButton().should('be.visible').click();
+    return this;
   }
 
-  typeRecipientName(name) {
-    this.recipientNameInput.clear().type(name);
+  // Verifies if the recipient appears in the list.
+  verifyRecipientInList(recipientName) {
+    this.recipientTable().should('contain', recipientName);
+    return this;
   }
 
-  searchRecipient(name) {
-    this.searchRecipientInput.clear().type(name);
-  }
-
-  selectRecipientByName(name) {
-    // Using contains to find a recipient item that matches the provided name
-    this.recipientListItems.contains(name).click();
-  }
-
-  // Assertions
-  verifyRecipientIsVisible(name) {
-    this.recipientListItems.contains(name).should('be.visible');
+  // Deletes a recipient given its name.
+  deleteRecipient(recipientName) {
+    this.deleteButton(recipientName).should('be.visible').click();
+    return this;
   }
 }
 
 export default new RecipientListPage();
---------------------------------------------------
-
-Key improvements include:
-• Encapsulation of element selectors as getters for easy maintenance.
-• Clear method names that indicate the action being performed.
-• Proper use of Cypress commands (like clear, type, click, and assertions) to ensure reliable test execution.
-• Exporting a single instance to keep usage in tests succinct, e.g.,
-  import recipientListPage from '../../pageObject/RecipientListPage';
-
-This structure improves readability, reusability, and maintains a clean separation of concerns between the page object and the test logic.
